@@ -8,15 +8,15 @@
 ;		Main Routine
 ;****************************************************
 
-stage1.a20.enable:
+bootstrap.a20.enable:
 
 	; Save clobber registers
 	push ax
 	push si
 	
 	; Print that we are attempting to enable A20 memory line
-	mov si, stage1.msg.a20.enable
-	call stage1.printString
+	mov si, bootstrap.msg.a20.enable
+	call bootstrap.printString
 
 	; Enable A20 through ps/2
 	in ax, 0x92
@@ -31,8 +31,8 @@ stage1.a20.enable:
 	; call our error handler
 	call .error
 	
-	mov si, stage1.msg.done
-	call stage1.printString
+	mov si, bootstrap.msg.done
+	call bootstrap.printString
 	
 	pop si
 	pop ax
@@ -54,14 +54,14 @@ stage1.a20.enable:
 	
 	.errorNotSupported:
 	
-		mov si, stage1.msg.a20.nosupp
-		call stage1.printString
+		mov si, bootstrap.msg.a20.nosupp
+		call bootstrap.printString
 	
 		jmp $
 	
 	.errorSecureMode:
 	
-		mov si, stage1.msg.a20.secmode
-		call stage1.printString
+		mov si, bootstrap.msg.a20.secmode
+		call bootstrap.printString
 	
 		jmp $

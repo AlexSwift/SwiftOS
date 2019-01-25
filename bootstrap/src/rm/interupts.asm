@@ -7,7 +7,7 @@
 ;****************************************************
 ;		Enable/Disable Interupts
 ;****************************************************
-stage1.interupts:
+bootstrap.interupts:
 .enable:
 
 	push ax

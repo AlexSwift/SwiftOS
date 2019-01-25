@@ -9,15 +9,15 @@
 ;		Message Data
 ;****************************************************
 
-bootstrap.msg.prefix:		db	"[Bootstrap] ",0
-bootstrap.msg.disk.error:	db	"Disk read error!", 0
-bootstrap.msg.disk.succ:	db	"Disk read of Stage1 Successful!", 0
+bootlace.msg.prefix:		db	"[Bootstrap] ",0
+bootlace.msg.disk.error:	db	"Disk read error!", 0
+bootlace.msg.disk.succ:	db	"Disk read of Stage1 Successful!", 0
 
 ;****************************************************
 ;		Disk Data
 ;****************************************************
 
-bootstrap.bootDrive:		db	0
+bootlace.bootDrive:		db	0
 
 bootloader.DAP: db 10h,0 
 .SectorsToRead:             dw SWIFTOS_BOOTSTRAP_SIZE		; Number of sectors to read (read size of OS) 

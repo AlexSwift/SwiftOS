@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;			swiftOS v0.4: Disk Loading (bootstrap)
+;			swiftOS v0.4: Disk Loading (bootlace)
 ;		with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -16,7 +16,7 @@ bootloader.loadStage1:
 	mov cx, 0x02    ; maximum attempts - 1
 	.top:
 		xor dx, dx
-		mov dl, [bootstrap.bootDrive]
+		mov dl, [bootlace.bootDrive]
 		lea si, [bootloader.DAP]
 		mov ah, 0x42	; read sectors into memory (int 0x13, ah = 0x02)
 		int 0x13
@@ -28,13 +28,13 @@ bootloader.loadStage1:
 		int 0x13
 		jc .top		; retry if reset succeeded, otherwise exit
 	.end:
-		mov si, bootstrap.msg.disk.succ
-		call bootstrap.printString
+		mov si, bootlace.msg.disk.succ
+		call bootlace.printString
 		popa
 		retn
 	
 	.errorjc:
-		mov si, bootstrap.msg.disk.error
-		call bootstrap.printString
+		mov si, bootlace.msg.disk.error
+		call bootlace.printString
 		jmp $
 

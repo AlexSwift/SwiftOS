@@ -15,8 +15,8 @@ bits		16
 ;		Trampoline to our main loader
 ;****************************************************
 
-stage1.entry:
-jmp SWIFTOS_BOOTSTRAP_SEGMNT:stage1.main
+bootstrap.entry:
+jmp SWIFTOS_BOOTSTRAP_SEGMNT:bootstrap.main
 
 ;****************************************************
 ;		Allign and setup OEM block
@@ -46,7 +46,7 @@ jmp SWIFTOS_BOOTSTRAP_SEGMNT:stage1.main
 ;		Main Loader
 ;****************************************************
 
-stage1.main:
+bootstrap.main:
 
 	; Setup general segment registers
 	mov ax, cs
@@ -63,42 +63,42 @@ stage1.main:
 	mov sp, 0x7C00
 
 	; Save Boot Drive letter for later use
-	mov [stage1.bootDrive],dl
+	mov [bootstrap.bootDrive],dl
 
 	; Print our fancy graphic (disable prefix)
-	mov [stage1.msg.doPrefix], byte 0
-	mov si, stage1.graphic2
-	call stage1.printString
-	mov [stage1.msg.doPrefix], byte 1
+	mov [bootstrap.msg.doPrefix], byte 0
+	mov si, bootstrap.graphic2
+	call bootstrap.printString
+	mov [bootstrap.msg.doPrefix], byte 1
 
 	; Print that we've landed in Stage1
-	mov si, stage1.msg.init
-	call stage1.printString
+	mov si, bootstrap.msg.init
+	call bootstrap.printString
 
 	; Enable A20 memory line
-	call stage1.a20.enable
+	call bootstrap.a20.enable
 
 	; Get memory map
-	call stage1.e820.fetchMap
+	call bootstrap.e820.fetchMap
 
 	; Print memory fetch
-	call stage1.e820.printMap
+	call bootstrap.e820.printMap
 
 	; Enable protected mode
-	call stage1.proctectedMode
+	call bootstrap.proctectedMode
 
 	; Load 2nd onto SWIFTOS_STAGE2_SEGMNT:SWIFTOS_STAGE2_OFFSET
-	;call stage1.loadStage2
+	;call bootstrap.loadStage2
 	
 	; Wait for key press before booting into stage2
-	;call stage1.keyWait
+	;call bootstrap.keyWait
 	
 	; Initializing.....
-	;mov si, stage1.msg.stage2Init
-	;call stage1.printString
+	;mov si, bootstrap.msg.stage2Init
+	;call bootstrap.printString
 
 	; Grab the boot drive data before we change our data segment
-	;mov dl, [stage1.bootDrive]
+	;mov dl, [bootstrap.bootDrive]
 	
 	; Setup the data stack pointer so our stage2 doesn't have to do it
 	;mov ax, SWIFTOS_STAGE2_SEGMNT
@@ -113,10 +113,10 @@ stage1.main:
 ;		Wait for key press
 ;****************************************************
 
-stage1.keyWait:
+bootstrap.keyWait:
 
-	mov si, stage1.msg.keyWait
-	call stage1.printString
+	mov si, bootstrap.msg.keyWait
+	call bootstrap.printString
 	
 	push ax
 

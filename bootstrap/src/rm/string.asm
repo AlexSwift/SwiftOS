@@ -4,7 +4,7 @@
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 	
-stage1.newLine:
+bootstrap.newLine:
 
 	push ax
 	
@@ -18,7 +18,7 @@ stage1.newLine:
 	
 	ret
 
-stage1.printChar:
+bootstrap.printChar:
 
 	push ax
 	push bx
@@ -32,18 +32,18 @@ stage1.printChar:
 	
 	ret	
 
-stage1.printPrefix:
+bootstrap.printPrefix:
 
 	push si
 	push ax
 
-	mov si, stage1.msg.prefix
+	mov si, bootstrap.msg.prefix
 	
 	.printprefixloop:
 		lodsb
 		test al,al
 		jz .prefixdone
-		call stage1.printChar
+		call bootstrap.printChar
 		jmp .printprefixloop
 
 	.prefixdone:
@@ -51,7 +51,7 @@ stage1.printPrefix:
 		pop si
 		ret
 	
-stage1.printString:
+bootstrap.printString:
 	
 	push ax
 	push ds
@@ -60,10 +60,10 @@ stage1.printString:
 	mov ds, ax
 	xor ax, ax
 
-	cmp [stage1.msg.doPrefix], byte 0
+	cmp [bootstrap.msg.doPrefix], byte 0
 	jpe .loop
 
-	call stage1.printPrefix
+	call bootstrap.printPrefix
 	
 	.loop:
 	
@@ -72,12 +72,12 @@ stage1.printString:
 		test al, al
 		jz  .done
 		
-		call stage1.printChar
+		call bootstrap.printChar
 		
 		jmp .loop
 	
 	.done:
-		call stage1.newLine
+		call bootstrap.newLine
 	
 		pop ds
 		pop ax
@@ -86,14 +86,14 @@ stage1.printString:
 
 ; si - souce address 
 ; dx - source size
-stage1.printHex:
+bootstrap.printHex:
 
 	pusha
 
 	mov al, "0"
-	call stage1.printChar
+	call bootstrap.printChar
 	mov al, "x"
-	call stage1.printChar
+	call bootstrap.printChar
 
 	;loop over every byte
 	.loop:
@@ -104,8 +104,8 @@ stage1.printHex:
 		and al, 0xf0
 		shr al, 4
 		mov bx, ax
-		mov al, [bx + stage1.msg.hexLoopup]
-		call stage1.printChar
+		mov al, [bx + bootstrap.msg.hexLoopup]
+		call bootstrap.printChar
 
 		mov ax, 0
 		mov bx, 0
@@ -113,8 +113,8 @@ stage1.printHex:
 		mov al, [si]
 		and al, 0x0f
 		mov bx, ax
-		mov al, [bx + stage1.msg.hexLoopup]
-		call stage1.printChar
+		mov al, [bx + bootstrap.msg.hexLoopup]
+		call bootstrap.printChar
 
 		inc si
 		dec dx
@@ -126,14 +126,14 @@ stage1.printHex:
 
 ; si - souce address 
 ; dx - source size
-stage1.printHexLittleEndian:
+bootstrap.printHexLittleEndian:
 
 	pusha
 
 	mov al, "0"
-	call stage1.printChar
+	call bootstrap.printChar
 	mov al, "x"
-	call stage1.printChar
+	call bootstrap.printChar
 
 	add si, dx
 	dec si
@@ -147,8 +147,8 @@ stage1.printHexLittleEndian:
 		and al, 0xf0
 		shr al, 4
 		mov bx, ax
-		mov al, [bx + stage1.msg.hexLoopup]
-		call stage1.printChar
+		mov al, [bx + bootstrap.msg.hexLoopup]
+		call bootstrap.printChar
 
 		mov ax, 0
 		mov bx, 0
@@ -156,8 +156,8 @@ stage1.printHexLittleEndian:
 		mov al, [si]
 		and al, 0x0f
 		mov bx, ax
-		mov al, [bx + stage1.msg.hexLoopup]
-		call stage1.printChar
+		mov al, [bx + bootstrap.msg.hexLoopup]
+		call bootstrap.printChar
 
 		dec si
 		dec dx

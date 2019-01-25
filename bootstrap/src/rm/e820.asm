@@ -4,15 +4,15 @@
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
-stage1.e820.fetchMap:
+bootstrap.e820.fetchMap:
 	
 	pusha
 
-	mov si, stage1.msg.e820.fetchMap
-	call stage1.printString
+	mov si, bootstrap.msg.e820.fetchMap
+	call bootstrap.printString
 
 	; Entries are stored in es:di; es is already a copy of ds
-	mov di, stage1.e820.data
+	mov di, bootstrap.e820.data
 	xor ebx, ebx
 	xor bp, bp
 	mov edx, 0x0534D4150		; Place signature in edx
@@ -64,51 +64,51 @@ stage1.e820.fetchMap:
 		jmp .finished
 
 	.unsupported:
-		mov si, stage1.msg.e820.nosupp
-		call stage1.printString
+		mov si, bootstrap.msg.e820.nosupp
+		call bootstrap.printString
 		jmp $
 
 	.finished:
-		mov [stage1.e820.entries], bp	; store the entry count
+		mov [bootstrap.e820.entries], bp	; store the entry count
 		clc			; there is "jc" on end of list to this point, so the carry must be cleared
 
-		mov si, stage1.msg.done
-		call stage1.printString
+		mov si, bootstrap.msg.done
+		call bootstrap.printString
 
 		popa 			
 		ret
 
 
-stage1.e820.printMap:
+bootstrap.e820.printMap:
 
 	pusha
 
-	mov ax, stage1.e820.data
+	mov ax, bootstrap.e820.data
 	mov bx, 0
-	mov cx, [stage1.e820.entries]
+	mov cx, [bootstrap.e820.entries]
 	mov dx, 0
-	mov si, stage1.e820.data
+	mov si, bootstrap.e820.data
 
 	.loop:
 
 		mov dx, 8
-		call stage1.printHexLittleEndian
+		call bootstrap.printHexLittleEndian
 
 		mov al, "-"
-		call stage1.printChar
+		call bootstrap.printChar
 
 		add si, 8
 		mov dx, 8
-		call stage1.printHexLittleEndian
+		call bootstrap.printHexLittleEndian
 
 		mov al, " "
-		call stage1.printChar
+		call bootstrap.printChar
 
 		add si, 8
 		mov dx, 4
-		call stage1.printHexLittleEndian
+		call bootstrap.printHexLittleEndian
 
-		call stage1.newLine
+		call bootstrap.newLine
 
 		add si, 8
 		dec cx

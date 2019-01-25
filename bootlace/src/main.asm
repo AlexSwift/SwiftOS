@@ -15,8 +15,8 @@ bits		16
 ;		Trampoline to our main loader
 ;****************************************************
 
-bootstrap.entry:
-jmp 0x07c0:bootstrap.relocate
+bootlace.entry:
+jmp 0x07c0:bootlace.relocate
 
 ;****************************************************
 ;		Allign and setup OEM block
@@ -41,7 +41,7 @@ jmp 0x07c0:bootstrap.relocate
 ;		Main Loader
 ;****************************************************
 
-bootstrap.relocate:
+bootlace.relocate:
 
 	; Setup Registers (Only what we need right now)
 
@@ -57,7 +57,7 @@ bootstrap.relocate:
 	mov sp, 0x7a00
 
 	; Save Boot Drive letter for later use
-	mov [bootstrap.bootDrive],dl
+	mov [bootlace.bootDrive],dl
 	
 	; Clear Screen
 	; Is this needed? Screen might be black
@@ -78,10 +78,10 @@ bootstrap.relocate:
 	mov ax, SWIFTOS_BOOTLACE_RELOC_SEGMNT
 	mov ds,ax
 	
-	jmp SWIFTOS_BOOTLACE_RELOC_SEGMNT:(SWIFTOS_BOOTLACE_RELOC_OFFSET + bootstrap.relocated)
+	jmp SWIFTOS_BOOTLACE_RELOC_SEGMNT:(SWIFTOS_BOOTLACE_RELOC_OFFSET + bootlace.relocated)
 	
 
-bootstrap.relocated:
+bootlace.relocated:
 
 	mov ax, cs
 	mov ds, ax
@@ -90,7 +90,7 @@ bootstrap.relocated:
 	call bootloader.loadStage1
 
 	; Grab the boot drive data before we change our data segment
-	mov dl, [bootstrap.bootDrive]
+	mov dl, [bootlace.bootDrive]
 	
 	; Setup the data stack pointer so our stage2 doesn't have to do it
 	mov ax, SWIFTOS_BOOTSTRAP_SEGMNT

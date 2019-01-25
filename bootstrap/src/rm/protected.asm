@@ -8,18 +8,18 @@
 ;		Load required environment for 32 bit
 ;****************************************************
 
-stage1.proctectedMode:
+bootstrap.proctectedMode:
 .pre:
 
 	; Disable Interupts
-	call stage1.interupts
+	call bootstrap.interupts
 
 	; Announce we are about to setup Protected Mode
-	mov si, stage1.msg.procPre
-	call stage1.printString
+	mov si, bootstrap.msg.procPre
+	call bootstrap.printString
 
 	; Load GDT
-	call stage1.gdt.load
+	call bootstrap.gdt.load
 	
 	; Load IDT
 	;call SWIFTOS_STAGE2_IDT_LOAD
@@ -38,8 +38,8 @@ stage1.proctectedMode:
 	mov ah, 0x03
 	mov bh, 0
 	int 0x10
-	mov [stage1.video.x], dl
-	mov [stage1.video.y], dh
+	mov [bootstrap.video.x], dl
+	mov [bootstrap.video.y], dh
 	
 	; Set Protected Mode
 	;mov eax, cr0
@@ -47,6 +47,6 @@ stage1.proctectedMode:
 	;mov cr0, eax
 	
 	; Jump into Protected Mode
-	;jmp stage1.gdt.stage2_code:init32.post
-	;jmp stage1.gdt.kernel_code:kmain
+	;jmp bootstrap.gdt.stage2_code:init32.post
+	;jmp bootstrap.gdt.kernel_code:kmain
 	jmp $

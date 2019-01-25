@@ -4,7 +4,7 @@
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
-bootstrap.clearScreen:
+bootlace.clearScreen:
 
 	; Uses ax,bx,cx,dx
 	
@@ -27,7 +27,7 @@ bootstrap.clearScreen:
 	
 	ret
 	
-bootstrap.newLine:
+bootlace.newLine:
 
 	push ax
 	
@@ -40,7 +40,7 @@ bootstrap.newLine:
 	
     	ret
 
-bootstrap.putChar:
+bootlace.putChar:
 
 	push ax
 	push bx
@@ -54,17 +54,17 @@ bootstrap.putChar:
 	
 	ret	
 	
-bootstrap.printPrefix:
+bootlace.printPrefix:
 
 	push si
 
-	mov si, bootstrap.msg.prefix
+	mov si, bootlace.msg.prefix
 	
 	.printprefixloop:
 		lodsb
 		test al,al
 		jz .prefixdone
-		call bootstrap.putChar
+		call bootlace.putChar
 		jmp .printprefixloop
 
 	.prefixdone:
@@ -72,7 +72,7 @@ bootstrap.printPrefix:
 	pop si
 	ret
 	
-bootstrap.printString:
+bootlace.printString:
 	
 	push ax
 	push ds
@@ -81,7 +81,7 @@ bootstrap.printString:
 	mov ds, ax
 	xor ax, ax
 
-	call bootstrap.printPrefix
+	call bootlace.printPrefix
 	
 	.loop:
 	
@@ -90,12 +90,12 @@ bootstrap.printString:
 		test al, al
 		jz  .done
 		
-		call bootstrap.putChar
+		call bootlace.putChar
 		
 		jmp .loop
 	
 	.done:
-	call bootstrap.newLine
+	call bootlace.newLine
 	
 	pop ds
 	pop ax

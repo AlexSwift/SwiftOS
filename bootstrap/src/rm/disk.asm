@@ -8,10 +8,10 @@
 ;		Load Stage2
 ;****************************************************
 
-stage1.loadStage2:
+bootstrap.loadStage2:
 
-	mov si, stage1.msg.loadStage2
-	call stage1.printString
+	mov si, bootstrap.msg.loadStage2
+	call bootstrap.printString
 
 	pusha	
 
@@ -19,8 +19,8 @@ stage1.loadStage2:
 	mov cx, 0x02    ; maximum attempts - 1
 	.top:
 		xor dx, dx
-		mov dl, [stage1.bootDrive]
-		lea si, [stage1.DAP]
+		mov dl, [bootstrap.bootDrive]
+		lea si, [bootstrap.DAP]
 		mov ah, 0x42	; read sectors into memory (int 0x13, ah = 0x02)
 		int 0x13
 		jnc .end	; exit if read succeeded
@@ -31,13 +31,13 @@ stage1.loadStage2:
 		int 0x13
 		jc .top		; retry if reset succeeded, otherwise exit
 	.end:
-		mov si, stage1.msg.disk.succ
-		call stage1.printString
+		mov si, bootstrap.msg.disk.succ
+		call bootstrap.printString
 		popa
 		retn
 	
 	.errorjc:
-		mov si, stage1.msg.disk.error
-		call stage1.printString
+		mov si, bootstrap.msg.disk.error
+		call bootstrap.printString
 		jmp $
 

@@ -7,11 +7,11 @@
 ;****************************************************
 ;		Segment references
 ;****************************************************
-stage1.gdt:
-.kernel_code		equ stage1.gdt.entry_kernel_code - stage1.gdt.entry_null
-.kernel_data 		equ stage1.gdt.entry_kernel_data - stage1.gdt.entry_null
-.kernel_stack	 	equ stage1.gdt.entry_kernel_stack - stage1.gdt.entry_null
-;.stage2_video	 	equ stage1.gdt.entry_stage2_video8025 - stage1.gdt.entry_null
+bootstrap.gdt:
+.kernel_code		equ bootstrap.gdt.entry_kernel_code - bootstrap.gdt.entry_null
+.kernel_data 		equ bootstrap.gdt.entry_kernel_data - bootstrap.gdt.entry_null
+.kernel_stack	 	equ bootstrap.gdt.entry_kernel_stack - bootstrap.gdt.entry_null
+;.stage2_video	 	equ bootstrap.gdt.entry_stage2_video8025 - bootstrap.gdt.entry_null
 
 ;****************************************************
 ;		GDT Data
@@ -21,14 +21,14 @@ stage1.gdt:
 	.entry_null: 
 		dd 0x0 
 		dd 0x0
-	;.gdt_stage1_code:
+	;.gdt_bootstrap_code:
 	;	dw 0xffff
 	;	dw 0x0
 	;	db 0x0
 	;	db 10011010b
 	;	db 11001111b
 	;	db 0x0
-	;.gdt_stage1_data: 
+	;.gdt_bootstrap_data: 
 	;	dw 0xffff
 	;	dw 0x0 
 	;	db 0x0
@@ -99,13 +99,13 @@ stage1.gdt:
 	push ax
 	push dx
 
-	mov si, stage1.msg.gdt.setup
-	call stage1.printString
+	mov si, bootstrap.msg.gdt.setup
+	call bootstrap.printString
 
 	lgdt [.gdt_desc]
 	
-	mov si, stage1.msg.done
-	call stage1.printString
+	mov si, bootstrap.msg.done
+	call bootstrap.printString
 	
 	pop dx
 	pop ax
