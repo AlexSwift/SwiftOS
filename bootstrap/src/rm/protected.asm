@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;						swiftOS v0.3: Init Protected Mode
+;						swiftOS v0.5: Init Protected Mode
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -16,7 +16,7 @@ bootstrap.proctectedMode:
 
 	; Announce we are about to setup Protected Mode
 	mov si, bootstrap.msg.procPre
-	call bootstrap.printString
+	call bootstrap.string.printString
 
 	; Load GDT
 	call bootstrap.gdt.load

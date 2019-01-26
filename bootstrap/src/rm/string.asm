@@ -1,10 +1,10 @@
 ;***************************************************************************
 ;
-;						swiftOS v0.3: Print String utils
+;						swiftOS v0.5: Print String utils
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 	
-bootstrap.newLine:
+bootstrap.string.newLine:
 
 	push ax
 	
@@ -18,7 +18,7 @@ bootstrap.newLine:
 	
 	ret
 
-bootstrap.printChar:
+bootstrap.string.printChar:
 
 	push ax
 	push bx
@@ -32,29 +32,28 @@ bootstrap.printChar:
 	
 	ret	
 
-bootstrap.printPrefix:
+bootstrap.string.printPrefix:
 
 	push si
 	push ax
 
 	mov si, bootstrap.msg.prefix
 	
-	.printprefixloop:
+	.loop:
 		lodsb
 		test al,al
-		jz .prefixdone
-		call bootstrap.printChar
-		jmp .printprefixloop
+		jz .done
+		call bootstrap.string.printChar
+		jmp .loop
 
-	.prefixdone:
+	.done:
 		pop ax
 		pop si
 		ret
 	
-bootstrap.printString:
+bootstrap.string.printString:
 	
-	push ax
-	push ds
+	pusha
 
 	mov ax, cs
 	mov ds, ax
@@ -63,7 +62,7 @@ bootstrap.printString:
 	cmp [bootstrap.msg.doPrefix], byte 0
 	jpe .loop
 
-	call bootstrap.printPrefix
+	call bootstrap.string.printPrefix
 	
 	.loop:
 	
@@ -72,28 +71,27 @@ bootstrap.printString:
 		test al, al
 		jz  .done
 		
-		call bootstrap.printChar
+		call bootstrap.string.printChar
 		
 		jmp .loop
 	
 	.done:
-		call bootstrap.newLine
+		call bootstrap.string.newLine
 	
-		pop ds
-		pop ax
+		popa
 	
 		ret
 
 ; si - souce address 
 ; dx - source size
-bootstrap.printHex:
+bootstrap.string.printHex:
 
 	pusha
 
 	mov al, "0"
-	call bootstrap.printChar
+	call bootstrap.string.printChar
 	mov al, "x"
-	call bootstrap.printChar
+	call bootstrap.string.printChar
 
 	;loop over every byte
 	.loop:
@@ -105,7 +103,7 @@ bootstrap.printHex:
 		shr al, 4
 		mov bx, ax
 		mov al, [bx + bootstrap.msg.hexLoopup]
-		call bootstrap.printChar
+		call bootstrap.string.printChar
 
 		mov ax, 0
 		mov bx, 0
@@ -114,7 +112,7 @@ bootstrap.printHex:
 		and al, 0x0f
 		mov bx, ax
 		mov al, [bx + bootstrap.msg.hexLoopup]
-		call bootstrap.printChar
+		call bootstrap.string.printChar
 
 		inc si
 		dec dx
@@ -126,14 +124,14 @@ bootstrap.printHex:
 
 ; si - souce address 
 ; dx - source size
-bootstrap.printHexLittleEndian:
+bootstrap.string.printHexLittleEndian:
 
 	pusha
 
 	mov al, "0"
-	call bootstrap.printChar
+	call bootstrap.string.printChar
 	mov al, "x"
-	call bootstrap.printChar
+	call bootstrap.string.printChar
 
 	add si, dx
 	dec si
@@ -148,7 +146,7 @@ bootstrap.printHexLittleEndian:
 		shr al, 4
 		mov bx, ax
 		mov al, [bx + bootstrap.msg.hexLoopup]
-		call bootstrap.printChar
+		call bootstrap.string.printChar
 
 		mov ax, 0
 		mov bx, 0
@@ -157,7 +155,7 @@ bootstrap.printHexLittleEndian:
 		and al, 0x0f
 		mov bx, ax
 		mov al, [bx + bootstrap.msg.hexLoopup]
-		call bootstrap.printChar
+		call bootstrap.string.printChar
 
 		dec si
 		dec dx
@@ -167,4 +165,27 @@ bootstrap.printHexLittleEndian:
 	popa
 	ret
 
+;return cx=0 for good comparison
+bootstrap.string.compareString:
+
+	pusha
+	; expects si and di to be pointing at strings
+	; cx is length of string
+
+	mov ax, ds
+	mov es, ax
+	
+	cld
+
+	repe cmpsb
+	jne .mismatch
+
+	.match:
+		popa
+		mov cx, 0
+		ret
+	.mismatch:
+		popa
+		mov cx, 1
+		ret
 

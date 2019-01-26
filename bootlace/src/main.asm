@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;				swiftOS v0.4: BootStrap
+;				swiftOS v0.5: BootStrap
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -10,13 +10,14 @@
 
 bits		16
 %include "defines.asm"
+global entry
 
 ;****************************************************
 ;		Trampoline to our main loader
 ;****************************************************
 
-bootlace.entry:
-jmp 0x07c0:bootlace.relocate
+entry:
+jmp SWIFTOS_BOOTLACE_SEGMNT:bootlace.relocate
 
 ;****************************************************
 ;		Allign and setup OEM block

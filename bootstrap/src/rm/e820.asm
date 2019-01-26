@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;			swiftOS v0.3: E820 memory map
+;			swiftOS v0.5: E820 memory map
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -9,7 +9,7 @@ bootstrap.e820.fetchMap:
 	pusha
 
 	mov si, bootstrap.msg.e820.fetchMap
-	call bootstrap.printString
+	call bootstrap.string.printString
 
 	; Entries are stored in es:di; es is already a copy of ds
 	mov di, bootstrap.e820.data
@@ -65,7 +65,7 @@ bootstrap.e820.fetchMap:
 
 	.unsupported:
 		mov si, bootstrap.msg.e820.nosupp
-		call bootstrap.printString
+		call bootstrap.string.printString
 		jmp $
 
 	.finished:
@@ -73,7 +73,7 @@ bootstrap.e820.fetchMap:
 		clc			; there is "jc" on end of list to this point, so the carry must be cleared
 
 		mov si, bootstrap.msg.done
-		call bootstrap.printString
+		call bootstrap.string.printString
 
 		popa 			
 		ret
@@ -92,23 +92,23 @@ bootstrap.e820.printMap:
 	.loop:
 
 		mov dx, 8
-		call bootstrap.printHexLittleEndian
+		call bootstrap.string.printHexLittleEndian
 
 		mov al, "-"
-		call bootstrap.printChar
+		call bootstrap.string.printChar
 
 		add si, 8
 		mov dx, 8
-		call bootstrap.printHexLittleEndian
+		call bootstrap.string.printHexLittleEndian
 
 		mov al, " "
-		call bootstrap.printChar
+		call bootstrap.string.printChar
 
 		add si, 8
 		mov dx, 4
-		call bootstrap.printHexLittleEndian
+		call bootstrap.string.printHexLittleEndian
 
-		call bootstrap.newLine
+		call bootstrap.string.newLine
 
 		add si, 8
 		dec cx

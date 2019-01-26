@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;						swiftOS v0.3: GDT Tables
+;						swiftOS v0.5: GDT Tables
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -100,12 +100,12 @@ bootstrap.gdt:
 	push dx
 
 	mov si, bootstrap.msg.gdt.setup
-	call bootstrap.printString
+	call bootstrap.string.printString
 
 	lgdt [.gdt_desc]
 	
 	mov si, bootstrap.msg.done
-	call bootstrap.printString
+	call bootstrap.string.printString
 	
 	pop dx
 	pop ax

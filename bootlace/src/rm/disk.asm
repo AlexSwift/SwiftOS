@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;			swiftOS v0.4: Disk Loading (bootlace)
+;			swiftOS v0.5: Disk Loading (bootlace)
 ;		with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -26,15 +26,14 @@ bootloader.loadStage1:
 		je  .errorjc	; exit if maximum attempts exceeded
 		xor ah, ah      ; reset disk system (int 0x13, ah = 0x00)
 		int 0x13
-		jc .top		; retry if reset succeeded, otherwise exit
+		jnc .top		; retry if reset succeeded, otherwise exit
+	.errorjc:
+		mov si, bootlace.msg.disk.error
+		call bootlace.printString
+		jmp $
 	.end:
 		mov si, bootlace.msg.disk.succ
 		call bootlace.printString
 		popa
 		retn
-	
-	.errorjc:
-		mov si, bootlace.msg.disk.error
-		call bootlace.printString
-		jmp $
 

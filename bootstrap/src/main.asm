@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;						swiftOS v0.3: Boot Sector
+;						swiftOS v0.5: Boot Sector
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -10,12 +10,13 @@
 
 bits		16
 %include "defines.asm"
+global entry
 
 ;****************************************************
 ;		Trampoline to our main loader
 ;****************************************************
 
-bootstrap.entry:
+entry:
 jmp SWIFTOS_BOOTSTRAP_SEGMNT:bootstrap.main
 
 ;****************************************************
@@ -48,6 +49,16 @@ jmp SWIFTOS_BOOTSTRAP_SEGMNT:bootstrap.main
 
 bootstrap.main:
 
+	; Relocate OEM table to our copy before it gets over written by our stack
+	mov cx, 0x0040
+	mov ax, SWIFTOS_BOOTLACE_RELOC_SEGMNT
+	mov ds, ax
+	mov ax, SWIFTOS_BOOTSTRAP_SEGMNT
+	mov es, ax
+	mov si, bootstrap.OEM.bi_PrimaryVolumeDescriptor	;Same offset for both si,di
+	mov di, bootstrap.OEM.bi_PrimaryVolumeDescriptor	
+	repnz movsb
+
 	; Setup general segment registers
 	mov ax, cs
 	mov ds, ax
@@ -56,24 +67,23 @@ bootstrap.main:
 	mov gs, ax
 
 	; Setup stack registers 
-	; (Optimize this with build, set ss to 0x07a0, bp and sp to 0x0200 - maybe with variable stack size )
 	mov ax, 0
 	mov ss, ax
-	mov bp, 0x7c00
-	mov sp, 0x7C00
+	mov bp, SWIFTOS_BOOTSTRAP_SEGMNT << 4
+	mov sp, bp
 
 	; Save Boot Drive letter for later use
 	mov [bootstrap.bootDrive],dl
 
 	; Print our fancy graphic (disable prefix)
 	mov [bootstrap.msg.doPrefix], byte 0
-	mov si, bootstrap.graphic2
-	call bootstrap.printString
+	mov si, bootstrap.graphic
+	call bootstrap.string.printString
 	mov [bootstrap.msg.doPrefix], byte 1
 
 	; Print that we've landed in Stage1
 	mov si, bootstrap.msg.init
-	call bootstrap.printString
+	call bootstrap.string.printString
 
 	; Enable A20 memory line
 	call bootstrap.a20.enable
@@ -82,30 +92,37 @@ bootstrap.main:
 	call bootstrap.e820.fetchMap
 
 	; Print memory fetch
-	call bootstrap.e820.printMap
+	;call bootstrap.e820.printMap
 
-	; Enable protected mode
-	call bootstrap.proctectedMode
-
-	; Load 2nd onto SWIFTOS_STAGE2_SEGMNT:SWIFTOS_STAGE2_OFFSET
-	;call bootstrap.loadStage2
+	; Load Kernel into diskTransferBuffer
+	call bootstrap.loadKernel
 	
-	; Wait for key press before booting into stage2
+	; Wait for key press before booting into kernel
 	;call bootstrap.keyWait
 	
 	; Initializing.....
-	;mov si, bootstrap.msg.stage2Init
-	;call bootstrap.printString
+	mov si, bootstrap.msg.kernelInit
+	call bootstrap.string.printString
+
+	; Enable protected mode
+	;call bootstrap.proctectedMode
+	
+	; relocate kernel
+	mov cx, 0x0200
+	mov ax, SWIFTOS_KERNEL_SEGMNT
+	mov es, ax
+	lea si, [bootstrap.diskTransferBuffer]
+	mov di, SWIFTOS_KERNEL_OFFSET
+	repnz movsb
 
 	; Grab the boot drive data before we change our data segment
-	;mov dl, [bootstrap.bootDrive]
-	
-	; Setup the data stack pointer so our stage2 doesn't have to do it
-	;mov ax, SWIFTOS_STAGE2_SEGMNT
-	;mov ds, ax
-	
-	; Code exists Stage1 and enters Stage2 Here
-	;jmp SWIFTOS_STAGE2_SEGMNT:SWIFTOS_STAGE2_OFFSET
+	mov dl, [bootstrap.bootDrive]
+
+	mov ax, SWIFTOS_KERNEL_SEGMNT
+	mov ds, ax
+
+	; Code exists Bootstrap and enters Kernel Here
+	jmp SWIFTOS_KERNEL_SEGMNT:SWIFTOS_KERNEL_OFFSET
 	jmp $
 
 	
@@ -115,13 +132,15 @@ bootstrap.main:
 
 bootstrap.keyWait:
 
+	push si
 	mov si, bootstrap.msg.keyWait
-	call bootstrap.printString
+	call bootstrap.string.printString
+	pop si
 	
 	push ax
 
-	mov     ah, 00h
-	int     16h
+	mov ah, 00h
+	int 16h
 	
 	pop ax
 	

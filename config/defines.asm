@@ -1,13 +1,13 @@
 ;***************************************************************************
 ;
-;			        swiftOS v0.4: Definitions
+;			        swiftOS v0.5: Definitions
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
 ; Define which file system we are to expect
 
-%define OEM_ISO
-;%define OEM_FAT12
+%define SWIFTOS_OEM_ISO
+;%define SWIFTOS_OEM_FAT12
 
 SWIFTOS_BOOTLACE_SEGMNT 			equ 0x07c0
 SWIFTOS_BOOTLACE_OFFSET 			equ 0x0000
@@ -28,7 +28,5 @@ SWIFTOS_BOOTSTRAP_RES_Y			equ	25
 
 ; Where to load Stage2
 ; Note: we are still limited by 16 bits
-SWIFTOS_KERNEL_SEGMNT 			equ 0x07e0
+SWIFTOS_KERNEL_SEGMNT 			equ 0x0900
 SWIFTOS_KERNEL_OFFSET 			equ 0x0000
-SWIFTOS_KERNEL_SECTOR			equ 0x0002
-SWIFTOS_KERNEL_SIZE				equ 0x04

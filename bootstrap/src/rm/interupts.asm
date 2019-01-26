@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;						swiftOS v0.3: Init Protected Mode
+;						swiftOS v0.5: Init Protected Mode
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 

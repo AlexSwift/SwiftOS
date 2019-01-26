@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;						swiftOS v0.3: A20 Memory Lane
+;						swiftOS v0.5: A20 Memory Lane
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -16,7 +16,7 @@ bootstrap.a20.enable:
 	
 	; Print that we are attempting to enable A20 memory line
 	mov si, bootstrap.msg.a20.enable
-	call bootstrap.printString
+	call bootstrap.string.printString
 
 	; Enable A20 through ps/2
 	in ax, 0x92
@@ -32,7 +32,7 @@ bootstrap.a20.enable:
 	call .error
 	
 	mov si, bootstrap.msg.done
-	call bootstrap.printString
+	call bootstrap.string.printString
 	
 	pop si
 	pop ax
@@ -55,13 +55,13 @@ bootstrap.a20.enable:
 	.errorNotSupported:
 	
 		mov si, bootstrap.msg.a20.nosupp
-		call bootstrap.printString
+		call bootstrap.string.printString
 	
 		jmp $
 	
 	.errorSecureMode:
 	
 		mov si, bootstrap.msg.a20.secmode
-		call bootstrap.printString
+		call bootstrap.string.printString
 	
 		jmp $

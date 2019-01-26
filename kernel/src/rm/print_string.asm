@@ -4,7 +4,7 @@
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
-bootlace.clearScreen:
+kernel.clearScreen:
 
 	; Uses ax,bx,cx,dx
 	
@@ -27,7 +27,7 @@ bootlace.clearScreen:
 	
 	ret
 	
-bootlace.newLine:
+kernel.newLine:
 
 	push ax
 	
@@ -40,7 +40,7 @@ bootlace.newLine:
 	
     	ret
 
-bootlace.putChar:
+kernel.putChar:
 
 	push ax
 	push bx
@@ -54,25 +54,25 @@ bootlace.putChar:
 	
 	ret	
 	
-bootlace.printPrefix:
+kernel.printPrefix:
 
-	push si
+	pusha
 
-	mov si, bootlace.msg.prefix
+	mov si, kernel.msg.prefix
 	
 	.printprefixloop:
 		lodsb
 		test al,al
 		jz .prefixdone
-		call bootlace.putChar
+		call kernel.putChar
 		jmp .printprefixloop
 
 	.prefixdone:
 
-	pop si
+	popa
 	ret
 	
-bootlace.printString:
+kernel.printString:
 	
 	push ax
 	push ds
@@ -81,7 +81,7 @@ bootlace.printString:
 	mov ds, ax
 	xor ax, ax
 
-	call bootlace.printPrefix
+	call kernel.printPrefix
 	
 	.loop:
 	
@@ -90,12 +90,12 @@ bootlace.printString:
 		test al, al
 		jz  .done
 		
-		call bootlace.putChar
+		call kernel.putChar
 		
 		jmp .loop
 	
 	.done:
-	call bootlace.newLine
+	call kernel.newLine
 	
 	pop ds
 	pop ax
