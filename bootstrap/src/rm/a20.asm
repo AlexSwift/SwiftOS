@@ -28,8 +28,10 @@ bootstrap.a20.enable:
 	mov ax, 2401h
 	int 15
 	
-	; call our error handler
-	call .error
+	cmp ah, 0x86
+	je .errorNotSupported
+	cmp ah, 01h
+	je .errorSecureMode
 	
 	mov si, bootstrap.msg.done
 	call bootstrap.string.printString
@@ -39,29 +41,22 @@ bootstrap.a20.enable:
 	
 	ret
 	
-	.error:
-	
-		push ax
-	
-		cmp ah, 0x86
-		je .errorNotSupported
-		cmp ah, 01h
-		je .errorSecureMode
-	
-		pop ax
-
-		ret
-	
 	.errorNotSupported:
 	
 		mov si, bootstrap.msg.a20.nosupp
 		call bootstrap.string.printString
 	
+		pop si
+		pop ax
+
 		jmp $
 	
 	.errorSecureMode:
 	
 		mov si, bootstrap.msg.a20.secmode
 		call bootstrap.string.printString
+
+		pop si
+		pop ax
 	
 		jmp $

@@ -53,10 +53,8 @@ bootstrap.string.printPrefix:
 	
 bootstrap.string.printString:
 	
-	pusha
+	push ax
 
-	mov ax, cs
-	mov ds, ax
 	xor ax, ax
 
 	cmp [bootstrap.msg.doPrefix], byte 0
@@ -78,7 +76,7 @@ bootstrap.string.printString:
 	.done:
 		call bootstrap.string.newLine
 	
-		popa
+		pop ax
 	
 		ret
 

@@ -4,12 +4,13 @@
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
+global bootstrap_video_x
+global bootstrap_video_y
 
 ;****************************************************
-;		Message Data
+;		Bootstrap Data - Everything we need from bootstrap
 ;****************************************************
 
-kernel.msg.prefix:		db	"[Kernel] ",0
-kernel.msg.welcome:	db	"Welcome to Kernel Land", 0
-
+bootstrap_video_x:			db 0
+bootstrap_video_y:			db 0
 

@@ -1,6 +1,6 @@
 ;***************************************************************************
 ;
-;						swiftOS v0.5: Disk Loading (stage2)
+;						swiftOS v0.5: Disk Loading (Kernel)
 ;			with thanks to osdev.org and it's contributors
 ;***************************************************************************
 
@@ -17,9 +17,6 @@ bootstrap.loadKernel:
 	call bootstrap.string.printString
 
 	; load the LBA of the Primary Volume Descriptor
-	;mov ax, SWIFTOS_BOOTLACE_RELOC_SEGMNT
-	;mov es, ax
-	;push word [es:SWIFTOS_BOOTLACE_RELOC_OFFSET + 8]
 	push word [bootstrap.OEM.bi_PrimaryVolumeDescriptor]
 	pop  word [bootstrap.DAP.lbaLow]
 	; Load the disk data
@@ -88,16 +85,18 @@ bootstrap.loadKernel:
 		mov ax, [ bootstrap.diskTransferBuffer + si + 10 ]
 		mov dx, [ bootstrap.diskTransferBuffer + si + 12 ]
 		div word [ bootstrap.sectorLength ]
-		cmp ax, 0
-		jne .min2
-		mov ax, 1
-		.min2:
+		inc ax
 		mov word [bootstrap.DAP.SectorsToRead], ax
 		; Same again, we store the LBA of file to load
 		push word [bootstrap.diskTransferBuffer + si + 2 ] ; 156 is the offset of the root directory
 		push word [bootstrap.diskTransferBuffer + si + 4 ] ; 156 is the offset of the root directory
 		pop word [bootstrap.DAP.lbaLow + 2] ; 2-4 little endian is the LBA location of extent root directory
 		pop word [bootstrap.DAP.lbaLow]
+
+		; load directly to memory
+		mov word [bootstrap.DAP.Segment], SWIFTOS_KERNEL_SEGMNT
+		mov word [bootstrap.DAP.Offset], SWIFTOS_KERNEL_OFFSET
+
 		; Load disk data
 		call bootstrap.loadDiskData
 

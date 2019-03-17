@@ -37,15 +37,19 @@ bootstrap.gdt:
 	;	db 0x0
 		
 	.entry_kernel_code:
-		dw 0x2000				;not sure what this limmit should be
-		dw SWIFTOS_KERNEL_SEGMNT*16 + SWIFTOS_KERNEL_OFFSET
+		;dw 0x2000				;not sure what this limmit should be
+		;dw SWIFTOS_KERNEL_SEGMNT*16 + SWIFTOS_KERNEL_OFFSET
+		dw 0xffff
+		dw 0x0000
 		db 0x0
 		db 10011110b 			; access (P, RING(2) , 1, Ex, DC, RW)
 		db 11000000b 			; granularity
 		db 0x00
 	.entry_kernel_data: 
-		dw 0x2000
-		dw SWIFTOS_KERNEL_SEGMNT*16 + SWIFTOS_KERNEL_OFFSET
+		;dw 0x2000
+		;dw SWIFTOS_KERNEL_SEGMNT*16 + SWIFTOS_KERNEL_OFFSET
+		dw 0xffff
+		dw 0x0000
 		db 0x0
 		db 10010010b			; access
 		db 11000000b 			; granularity
@@ -87,7 +91,7 @@ bootstrap.gdt:
 
 .gdt_desc:
 	dw .gdt_end - .gdt_start - 1
-	dd SWIFTOS_KERNEL_SEGMNT*16 + .gdt_start
+	dd SWIFTOS_BOOTSTRAP_SEGMNT*16 + .gdt_start
 	
 ;****************************************************
 ;		Load GDT into memory
@@ -96,8 +100,6 @@ bootstrap.gdt:
 .load:
 
 	push si
-	push ax
-	push dx
 
 	mov si, bootstrap.msg.gdt.setup
 	call bootstrap.string.printString
@@ -107,8 +109,6 @@ bootstrap.gdt:
 	mov si, bootstrap.msg.done
 	call bootstrap.string.printString
 	
-	pop dx
-	pop ax
 	pop si
 	
 	ret

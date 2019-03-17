@@ -40,8 +40,8 @@ jmp SWIFTOS_BOOTSTRAP_SEGMNT:bootstrap.main
 %include "rm/e820.asm"
 %include "rm/gdt.asm"
 %include "rm/interupts.asm"
-%include "rm/protected.asm"
 %include "rm/string.asm"
+%include "rm/video.asm"
 
 ;****************************************************
 ;		Main Loader
@@ -50,7 +50,7 @@ jmp SWIFTOS_BOOTSTRAP_SEGMNT:bootstrap.main
 bootstrap.main:
 
 	; Relocate OEM table to our copy before it gets over written by our stack
-	mov cx, 0x0040
+	mov cx, (0x0040 - 0x008)
 	mov ax, SWIFTOS_BOOTLACE_RELOC_SEGMNT
 	mov ds, ax
 	mov ax, SWIFTOS_BOOTSTRAP_SEGMNT
@@ -99,30 +99,58 @@ bootstrap.main:
 	
 	; Wait for key press before booting into kernel
 	;call bootstrap.keyWait
+
+	; relocate kernel
+	;mov cx, 0x800
+	;mov ax, SWIFTOS_KERNEL_SEGMNT
+	;mov es, ax
+	;lea si, [bootstrap.diskTransferBuffer]
+	;mov di, SWIFTOS_KERNEL_OFFSET
+	;repnz movsb
 	
 	; Initializing.....
 	mov si, bootstrap.msg.kernelInit
 	call bootstrap.string.printString
 
-	; Enable protected mode
-	;call bootstrap.proctectedMode
-	
-	; relocate kernel
-	mov cx, 0x0200
-	mov ax, SWIFTOS_KERNEL_SEGMNT
-	mov es, ax
-	lea si, [bootstrap.diskTransferBuffer]
-	mov di, SWIFTOS_KERNEL_OFFSET
-	repnz movsb
+	;call bootstrap.interupts
+
+	mov si, bootstrap.msg.procPre
+	call bootstrap.string.printString
+
+	; Load GDT
+	call bootstrap.gdt.load
+
+	; Disable interupts
+	call bootstrap.interupts.disable
 
 	; Grab the boot drive data before we change our data segment
 	mov dl, [bootstrap.bootDrive]
 
-	mov ax, SWIFTOS_KERNEL_SEGMNT
+	call bootstrap.video.updateCursorPosition
+	mov bl, byte [bootstrap.video.x]
+	mov bh, byte [bootstrap.video.y]
+	call bootstrap.video.disableCursor
+
+	; Set Protected Mode
+	mov eax, cr0
+	or al, 1
+	mov cr0, eax
+
+	mov ax, bootstrap.gdt.kernel_data
 	mov ds, ax
 
+	; Setup stack segments
+	;;mov ax, bootstrap.gdt.kernel_stack
+	mov ss, ax
+	
+	; Set the Stack base to the base of our stack segment
+	mov ebp, 0x7a00
+	mov esp, ebp
+
+	jmp bootstrap.gdt.kernel_code:0x9000
+
 	; Code exists Bootstrap and enters Kernel Here
-	jmp SWIFTOS_KERNEL_SEGMNT:SWIFTOS_KERNEL_OFFSET
+	;jmp SWIFTOS_KERNEL_SEGMNT:SWIFTOS_KERNEL_OFFSET
 	jmp $
 
 	

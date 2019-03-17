@@ -22,7 +22,7 @@ bootstrap.msg.procPre:		db "Attempting to boot into 32-bit mode!",0
 ; Stage2 specific messages
 bootstrap.msg.loadKernel:	db "Loading KERNEL.BIN into memory",0
 bootstrap.msg.keyWait:		db "Press any key to boot Kernel",0
-bootstrap.msg.kernelInit:	db "Initiating Kernel",0
+bootstrap.msg.kernelInit:	db "Initiating Kernel environment",0
 
 ; Disk messages
 
