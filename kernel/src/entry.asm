@@ -22,7 +22,7 @@ extern kernel_main
 section .stub
 
 entry:
-call kernel.entry
+jmp kernel.entry
 
 ;****************************************************
 ;		Data
@@ -46,7 +46,7 @@ kernel.entry:
 	mov [bootstrap_video_x], bl
 	mov [bootstrap_video_y], bh
 
-	call kernel_main
+	jmp kernel_main
 	jmp $
 
 section .text

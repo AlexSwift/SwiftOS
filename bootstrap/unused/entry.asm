@@ -9,8 +9,13 @@
 ;****************************************************
 
 bits		16
+
 %include "defines.asm"
+
 global entry
+
+extern c_main
+extern __stack_start
 
 ;****************************************************
 ;		Trampoline to our main loader
@@ -35,9 +40,8 @@ jmp SWIFTOS_BOOTSTRAP_SEGMNT:bootstrap.main
 ;		Include Stage1 Libraries
 ;****************************************************	
 
-%include "rm/a20.asm"
+%include "intcall.asm"
 %include "rm/disk.asm"
-%include "rm/e820.asm"
 %include "rm/gdt.asm"
 %include "rm/interupts.asm"
 %include "rm/string.asm"
@@ -55,8 +59,8 @@ bootstrap.main:
 	mov ds, ax
 	mov ax, SWIFTOS_BOOTSTRAP_SEGMNT
 	mov es, ax
-	mov si, bootstrap.OEM.bi_PrimaryVolumeDescriptor	;Same offset for both si,di
-	mov di, bootstrap.OEM.bi_PrimaryVolumeDescriptor	
+	mov si, oem_bi_PrimaryVolumeDescriptor	;Same offset for both si,di
+	mov di, oem_bi_PrimaryVolumeDescriptor	
 	repnz movsb
 
 	; Setup general segment registers
@@ -66,33 +70,18 @@ bootstrap.main:
 	mov fs, ax
 	mov gs, ax
 
-	; Setup stack registers 
-	mov ax, 0
+	mov ax, 0x7c0
 	mov ss, ax
-	mov bp, SWIFTOS_BOOTSTRAP_SEGMNT << 4
+	mov ax, __stack_start
+	add ax, 0x1000
+	mov bp, ax
 	mov sp, bp
 
 	; Save Boot Drive letter for later use
 	mov [bootstrap.bootDrive],dl
 
-	; Print our fancy graphic (disable prefix)
-	mov [bootstrap.msg.doPrefix], byte 0
-	mov si, bootstrap.graphic
-	call bootstrap.string.printString
-	mov [bootstrap.msg.doPrefix], byte 1
-
-	; Print that we've landed in Stage1
-	mov si, bootstrap.msg.init
-	call bootstrap.string.printString
-
-	; Enable A20 memory line
-	call bootstrap.a20.enable
-
-	; Get memory map
-	call bootstrap.e820.fetchMap
-
-	; Print memory fetch
-	;call bootstrap.e820.printMap
+	call c_main
+	jmp $ ;BREAKPOINT
 
 	; Load Kernel into diskTransferBuffer
 	call bootstrap.loadKernel
@@ -147,7 +136,8 @@ bootstrap.main:
 	mov ebp, 0x7a00
 	mov esp, ebp
 
-	jmp bootstrap.gdt.kernel_code:0x9000
+	push dword 0x2BADB002
+	call bootstrap.gdt.kernel_code:0x9000
 
 	; Code exists Bootstrap and enters Kernel Here
 	;jmp SWIFTOS_KERNEL_SEGMNT:SWIFTOS_KERNEL_OFFSET

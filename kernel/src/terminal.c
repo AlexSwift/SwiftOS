@@ -64,7 +64,7 @@ void terminal_initialize(void)
 
 }
 
-void terminal_clearScreen(void)
+void terminal_clearscreen(void)
 {
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {

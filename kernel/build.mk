@@ -1,6 +1,6 @@
 # CFLAGS for module 'bar'
 CFLAGS_kernel := -std=gnu99 -ffreestanding -Wall -Wextra -Ikernel/includes/
-LDFLAGS_kernel := -T kernel/linker.ld --oformat binary 
+LDFLAGS_kernel := -T kernel/linker.ld -Wl,--oformat=binary 
 
 # Executable to build in module 'bar'
 kernel_PROGRAM := kernel
@@ -17,4 +17,5 @@ kernel_SOURCES := main.c \
 	terminal.c \
 	pic.c \
 	interupts.c \
-	devices/keyboard.c
+	devices/keyboard.c \
+	devices/timer.c

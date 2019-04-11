@@ -17,7 +17,7 @@ bootstrap.loadKernel:
 	call bootstrap.string.printString
 
 	; load the LBA of the Primary Volume Descriptor
-	push word [bootstrap.OEM.bi_PrimaryVolumeDescriptor]
+	push word [oem_bi_PrimaryVolumeDescriptor]
 	pop  word [bootstrap.DAP.lbaLow]
 	; Load the disk data
 	call bootstrap.loadDiskData

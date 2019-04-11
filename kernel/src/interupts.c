@@ -5,6 +5,7 @@
 #include "io.h"
 #include "pic.h"
 
+#include "devices/timer.h"
 #include "devices/keyboard.h"
 
 #include <libk/stdio.h>
@@ -16,24 +17,31 @@ unsigned long idt_ptr[2];
 
 unsigned long idt_common_handler( unsigned long interupt, unsigned long error, unsigned long eip ){
 
-	if (interupt == 0x01){
-		printf("[Kernel] Test Int! %d\n", error );
-	}
-
-	if (interupt == 0x0D){
-		unsigned long cs = (unsigned long)(*(&eip + 1));
-		printf("[Kernel] General Protection Fault! %d %d %d\n", eip, error, cs );
-		abort();
-	}
-
-	if (( 0x20<=interupt ) && (interupt<0x30)){
-		if (interupt == 0x21){
+	switch (interupt){
+		case 0x01:
+			printf("[Kernel] Test Int! %d\n", error );
+			break;
+		case 0x0D:{
+			unsigned long cs = (unsigned long)(*(&eip + 1));
+			printf("[Kernel] General Protection Fault! %d %d %d\n", eip, error, cs );
+			abort();
+			break;
+		};
+		case 0x20:
+			timer_interupt_handler();
+			break;
+		case 0x21:
 			keyboard_interupt_handler();
-		}else if(interupt == 0x2C){
+			break;
+		case 0x2C:
 			printf("[Kernel] Received Ps/2 mouse! %d\n", error );
-		}
-		pic_sendEOI( interupt - 0x20 );
+			break;
+		default:
+			printf("[Kernel] Unregistered interupt! %d\n", interupt );
 	}
+
+	if (( 0x20<=interupt ) && (interupt<0x30))
+		pic_sendEOI( interupt - 0x20 );
 
 	return eip;
 }
@@ -62,8 +70,4 @@ void interupts_init(void){
 	idt_ptr[1] = idt_address >> 16 ;
 
 	idt_load(idt_ptr);
-
-	keyboard_initialize();
-
-	asm("int $0x01;");
 }

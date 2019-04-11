@@ -35,7 +35,7 @@ void terminal_write(const char* data, size_t size);
 void terminal_writestring(const char* data);
 void terminal_newline();
 void terminal_initialize(void);
-void terminal_clearScreen(void);
+void terminal_clearscreen(void);
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) 
 {
